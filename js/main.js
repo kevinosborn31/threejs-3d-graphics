@@ -44,6 +44,10 @@ app.init = () => {
   app.plane = app.createPlane();
   app.scene.add( app.plane );
 
+  // Let there bbe light!
+  app.spotlight = app.createSpotlight();
+  app.scene.add( app.spotlight );
+
   // Finally, actually render everything once
   app.renderer.render( app.scene, app.camera );
 
