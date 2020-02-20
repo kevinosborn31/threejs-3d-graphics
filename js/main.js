@@ -3,8 +3,17 @@
 // (only works for 'var' because of 'hoisting', google it)
 var app = app || {};
 
+app.controls = {
+  rotationSpeed: 0.01,
+  bouncingSpee: 0.05,
+  step: 0 // for controlling the sphere position
+};
+
 app.init = () => {
   console.log('Hello 3D world!');
+
+  app.gui = new dat.GUI();
+  app.gui.add( app.controls, 'rotationSpeed', 0, 1);
 
   // The scene stores and keeps track of all the objects we're creating,
   // including the camera and the lights
@@ -44,14 +53,49 @@ app.init = () => {
   app.plane = app.createPlane();
   app.scene.add( app.plane );
 
+  app.cube = app.createCube();
+  app.scene.add( app.cube );
+
+  app.sphere = app.createSphere();
+  app.scene.add( app.sphere );
+
   // Let there bbe light!
   app.spotlight = app.createSpotlight();
   app.scene.add( app.spotlight );
 
-  // Finally, actually render everything once
-  app.renderer.render( app.scene, app.camera );
+  app.ambient = new THREE.AmbientLight( 0xFFFFFF );
+
+  // Control camera position and zoom using the mouse
+  app.mouseControls = new THREE.OrbitControls(
+    app.camera,
+    app.renderer.domElement
+  );
+
+  app.animate();
 
 }; // app.init()
+
+app.animate = () => {
+
+  app.controls.step += app.controls.bouncingSpeed;
+
+  app.sphere.position.y = 6 + Math.abs( Math.sin( app.controls.step ) * 10);
+
+  app.sphere.position.x = 20 + Math.abs( Math.cos( app.controls.step ) * 10);
+
+  app.cube.rotation.x += app.controls.rotationSpeed;
+  app.cube.rotation.y += app.controls.rotationSpeed;
+
+  app.renderer.render( app.scene, app.camera );
+
+  // Get the browser animation API to work out
+  // how often to run our animate() method
+  // (ideally, 60 times/sec and only when the tab
+  // is visible)
+  requestAnimationFrame( app.animate );
+};
+
+
 
 // Like jQuery $(document).ready() - run our function
 // after the DOM is loaded
